@@ -23,6 +23,7 @@ namespace Script.Core
             }
         }
 
+
         private void Awake()
         {
             _instance = this;

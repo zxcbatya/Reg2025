@@ -4,7 +4,7 @@ namespace Script.Core
 {
     public class MoneyStorage
     {
-        public event Action<int> OnMoneyChanged; 
+        public event Action<int, int> OnMoneyChanged; 
 
         private int _money;
 
@@ -17,16 +17,16 @@ namespace Script.Core
 
         public void Earn(int amount)
         {
-            if (amount <= 0) return;
+            int old = _money;
             _money += amount;
-            OnMoneyChanged?.Invoke(_money);
+            OnMoneyChanged?.Invoke(_money, amount); 
         }
 
         public void Spend(int amount)
         {
-            if (amount <= 0 || amount > _money) return;
+            int old = _money;
             _money -= amount;
-            OnMoneyChanged?.Invoke(_money);
+            OnMoneyChanged?.Invoke(_money, -amount);
         }
 
         public bool CanAfford(int amount)

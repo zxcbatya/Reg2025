@@ -14,9 +14,12 @@ namespace Script.UI.ShopCoins
 
         private System.Action<bool> _onComplete;
 
+        public void Initialize()
+        {
+            instance = this;
+        }
         private void Awake()
         {
-            if (instance == null) instance = this;
             videoPlayer.loopPointReached += OnVideoEnd;
             closeButton.onClick.AddListener(CloseVideo);
         }

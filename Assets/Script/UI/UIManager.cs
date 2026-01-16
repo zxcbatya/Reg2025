@@ -1,4 +1,5 @@
 using Script.Core;
+using Script.UI.ShopCoins;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,107 +7,96 @@ namespace Script.UI
 {
     public class UIManager : MonoBehaviour
     {
+        [Header("Panels")]
         [SerializeField] private GameObject panelMain;
         [SerializeField] private GameObject panelSettings;
         [SerializeField] private GameObject panelShopCoins;
-        [SerializeField] private GameObject panelShopBackGround;
+        [SerializeField] private GameObject panelShopBackGround; 
         [SerializeField] private GameObject paymentOverlay;
+        
+        [SerializeField] private MoneyView creditBuy;
+        [SerializeField] private ShopPanel shopPanel;
+        [SerializeField] private VideoService videoPanel;
 
+
+        [Header("Navigation Buttons")]
         [SerializeField] private Button playButton;
         [SerializeField] private Button settingsButton;
         [SerializeField] private Button exitButton;
         [SerializeField] private Button levelEditorButton;
+        [SerializeField] private Button showShopButton;
+        
+        [Header("Back Buttons")]
+        [SerializeField] private Button backCoinsShopButton;
 
-        [Header("ShopCredits")] [SerializeField]
-        private Button showShopButton;
-
-        [SerializeField] private Button creditsButton;
-        [SerializeField] private Button videoAddedMoneyButton;
-        [SerializeField] private Button addedMoneyButton;
-        [Header("ShopFon")] [SerializeField] private Button buyButton;
-
+        
         private MoneyStorage _moneyStorage;
+
         public static UIManager Instance { get; private set; }
+        
+        public MoneyStorage MoneyStorage => _moneyStorage;
 
         private void Awake()
         {
-                Instance = this;
+            _moneyStorage = new MoneyStorage(1000);
+            Instance = this;
+            shopPanel.Initialize(_moneyStorage, () => creditBuy.Init(_moneyStorage));
+            creditBuy.Init(_moneyStorage);
+            videoPanel.Initialize();
         }
 
         private void OnEnable()
         {
-            playButton.onClick.AddListener(Play);
-            settingsButton.onClick.AddListener(ShowSettings);
-            showShopButton.onClick.AddListener(ShowShopCoins);
-            levelEditorButton.onClick.AddListener(OpenLevelEditor);
-            exitButton.onClick.AddListener(Exit);
+            playButton.onClick.AddListener(OnPlayClicked);
+            settingsButton.onClick.AddListener(OnSettingsClicked);
+            showShopButton.onClick.AddListener(OnShowShopClicked);
+            levelEditorButton.onClick.AddListener(OnLevelEditorClicked);
+            exitButton.onClick.AddListener(OnExitClicked);
+            backCoinsShopButton.onClick.AddListener(OnBackCoinsShopClicked);
         }
 
         private void OnDisable()
         {
-            playButton.onClick.RemoveListener(Play);
-            settingsButton.onClick.RemoveListener(ShowSettings);
-            showShopButton.onClick.RemoveListener(ShowShopCoins);
-            levelEditorButton.onClick.RemoveListener(OpenLevelEditor);
-            exitButton.onClick.RemoveListener(Exit);
+            playButton.onClick.RemoveListener(OnPlayClicked);
+            settingsButton.onClick.RemoveListener(OnSettingsClicked);
+            showShopButton.onClick.RemoveListener(OnShowShopClicked);
+            levelEditorButton.onClick.RemoveListener(OnLevelEditorClicked);
+            exitButton.onClick.RemoveListener(OnExitClicked);
         }
 
         private void Start()
         {
-            panelMain.gameObject.SetActive(true);
+            ShowPanel(panelMain);
+
         }
 
-
-        private void ShowShopCoins()
+        public void ShowPanel(GameObject panel)
         {
             HideAll();
-            panelShopCoins.gameObject.SetActive(true);
+            panel?.SetActive(true);
         }
 
-        private void ShowSettings()
-        {
-            HideAll();
-            panelSettings.gameObject.SetActive(!panelSettings.gameObject.activeSelf);
-        }
+        public void ShowPaymentOverlay() => paymentOverlay.SetActive(true);
+        public void HidePaymentOverlay() => paymentOverlay.SetActive(false);
 
-        private void OpenLevelEditor()
-        {
-        }
+        private void OnPlayClicked() => HideAll(); // переход потом
+        private void OnSettingsClicked() => TogglePanel(panelSettings);
+        private void OnShowShopClicked() => ShowPanel(panelShopCoins);
+        private void OnLevelEditorClicked() { /* говно */ }
+        private void OnExitClicked() => Application.Quit();
+        private void OnBackCoinsShopClicked() => ShowPanel(panelMain);
 
-        public void ShowPaymentOverlay()
+        private void TogglePanel(GameObject panel)
         {
-            paymentOverlay.gameObject.SetActive(true);
-        }
-
-        public void HidePaymentOverlay()
-        {
-            paymentOverlay.gameObject.SetActive(false);
-        }
-
-        private void Play()
-        {
-            HideAll();
-        }
-
-        public void BuyItem(int cost)
-        {
-            if (_moneyStorage.CanAfford(cost))
-            {
-                _moneyStorage.Spend(cost);
-            }
-        }
-
-        public void Exit()
-        {
-            Application.Quit();
+            panel.SetActive(!panel.activeSelf);
         }
 
         private void HideAll()
         {
-            panelMain.gameObject.SetActive(false);
-            panelSettings.gameObject.SetActive(false);
-            panelShopCoins.gameObject.SetActive(false);
-            panelShopBackGround.gameObject.SetActive(false);
+            panelMain.SetActive(false);
+            panelSettings.SetActive(false);
+            panelShopCoins.SetActive(false);
+            panelShopBackGround.SetActive(false);
         }
     }
 }

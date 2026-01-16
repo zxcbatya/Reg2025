@@ -1,5 +1,6 @@
 ﻿using System;
 using Script.Core;
+using UnityEngine;
 
 namespace Script.UI.ShopCoins
 {
@@ -7,6 +8,7 @@ namespace Script.UI.ShopCoins
     {
         private readonly MoneyStorage _moneyStorage;
         private readonly Action _onUpdateUI;
+        public event Action OnFreeCoinsCooldownStarted;
 
         public ShopCoinsController(MoneyStorage moneyStorage, Action onUpdateUI)
         {
@@ -14,14 +16,19 @@ namespace Script.UI.ShopCoins
             _onUpdateUI = onUpdateUI;
         }
 
-        public void Buy100()
+        public void Buy150()
         {
             SimulatePayment(() => _moneyStorage.Earn(100));
         }
 
-        public void Buy500()
+        public void Buy450()
         {
             SimulatePayment(() => _moneyStorage.Earn(500));
+        }
+
+        public void Buy1000()
+        {
+            SimulatePayment(() => _moneyStorage.Earn(1000));
         }
 
         public void TryGetFreeCoins()
@@ -30,6 +37,7 @@ namespace Script.UI.ShopCoins
             {
                 _moneyStorage.Earn(100);
                 TimeService.SetLastUsed("FreeCoins");
+                OnFreeCoinsCooldownStarted?.Invoke();
             }
 
             _onUpdateUI?.Invoke();
@@ -39,7 +47,6 @@ namespace Script.UI.ShopCoins
         {
             if (TimeService.IsAvailable("AdCoins", 30))
             {
-                // Открыть видео
                 VideoService.instance.PlayAd(OnAdCompleted);
             }
 
@@ -48,11 +55,8 @@ namespace Script.UI.ShopCoins
 
         private void OnAdCompleted(bool watchedToTheEnd)
         {
-            if (watchedToTheEnd)
-            {
-                _moneyStorage.Earn(100);
-                TimeService.SetLastUsed("AdCoins");
-            }
+            _moneyStorage.Earn(100);
+            TimeService.SetLastUsed("AdCoins");
 
             _onUpdateUI?.Invoke();
         }
@@ -67,5 +71,6 @@ namespace Script.UI.ShopCoins
                 _onUpdateUI?.Invoke();
             }));
         }
+
     }
 }

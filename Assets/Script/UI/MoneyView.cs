@@ -14,12 +14,18 @@ namespace Script.UI
         {
             _moneyStorage = storage;
             _moneyStorage.OnMoneyChanged += OnMoneyChanged;
-            OnMoneyChanged(_moneyStorage.Money); 
+            OnMoneyChanged(_moneyStorage.Money, 0);
         }
 
-        private void OnMoneyChanged(int amount)
+        private void OnDestroy()
         {
-            coinsText.text = FormatCoins(amount);
+            if (_moneyStorage != null)
+                _moneyStorage.OnMoneyChanged -= OnMoneyChanged;
+        }
+
+        private void OnMoneyChanged(int newAmount, int delta)
+        {
+            coinsText.text = FormatCoins(newAmount);
         }
 
         private string FormatCoins(int value)
